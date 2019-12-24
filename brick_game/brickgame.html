@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charser="urf-8" />
+    <title>Brick game js practice</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      canvas {
+        background: #eee;
+        display: block;
+        margin: auto;
+      }
+      .modal {
+        display: none;
+      }
+      .open {
+        display: flex;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: gray;
+        background-color: rgba(0, 0, 0, 0.35); 
+        top: 0;
+        left: 0;
+        justify-content: center;
+        align-items: center;
+      }
+      #container {
+        display: flex;
+        margin: auto;
+        width: 500px;
+        height: 500px;
+        position: relative;
+      }
+
+      button {
+        width: 100px;
+        height: 40px;
+        background: blue;
+        font-size: 20px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <canvas id='gameCanvas' width="480" height="320"></canvas>
+      
+      <div class='modal'>
+        <button id="reset" onclick='reset()'>다시하기</button>
+      </div>
+
+    </div>
+    <script type="text/javascript" src="./jsfile.js"></script>
+
+  </body>
+</html>
