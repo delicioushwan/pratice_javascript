@@ -13,17 +13,17 @@ span {
   box-sizing: border-box;
 }
 
-#root {
-  display: flex;
-  margin: auto;
-  justify-content: center;
-  align-items: center;
+#score {
+  height: 200px;
+  width: 100%;
 }
 
 /* cell 30 * 30 */
 #container {
   display: flex;
-  height: 1200px;
+  height: 800px;
+  width: 800px;
+  margin: auto;
 }
 
 #game_window {
@@ -63,7 +63,11 @@ span {
 .block_span {
   position: absolute;
   display: block;
+  visibility: hidden;
+}
 
+.invisible {
+  visibility: hidden;
 }
 
 .bar {
@@ -88,4 +92,8 @@ span {
 
 .s {
   background: purple;
+}
+
+.ㅗ {
+  background: orange;
 }
