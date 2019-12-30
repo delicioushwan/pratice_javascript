@@ -10,6 +10,8 @@ let count = 0;
 let center = Math.floor((coloum - 1) / 2)
 let onMove = false;
 let checkBoard = [];
+let oneRow = []
+let nothing = false;
 
 for(let i = 0; i <= row; i ++) {
   checkBoard.push([])
@@ -28,19 +30,25 @@ for(let i = 0; i < row; i ++) {
   }
 }
 
-document.addEventListener('keydown',toMoveBlock)
+for(let j = 0; j < coloum; j ++) {
+  oneRow.push(false);
+}
 
+document.addEventListener('keydown',toMoveBlock)
 
 function toMoveBlock(e) {
   onMove = true;
   switch (e.code) {
     case 'ArrowLeft':
+      e.preventDefault();
       move(-1, 0)
       break;
     case 'ArrowRight':
+      e.preventDefault();
       move(1, 0)
       break;
     case 'ArrowUp':
+      e.preventDefault();
       rotate()
       break;
     default:
@@ -80,19 +88,17 @@ function makeSpan(x, y, style) {
 }
 
 function move(dx, dy) {
-  // console.log('move')
   let wall = false;
   for (let i in current) {
-    if (Math.floor(current[i].y + 1) < 0) {
+    if (current[i].y < 0) {
       wall = true;
     } else if(current[i].x + dx < 0 || current[i].x + dx > coloum - 1) {
       wall = true;
-    } else if(checkBoard[Math.floor(current[i].y + 1)][current[i].x + 1] || checkBoard[Math.floor(current[i].y + 1)][current[i].x - 1]) {
+    } else if(checkBoard[current[i].y + 1 + dy][current[i].x + dx] || checkBoard[current[i].y + 1 + dy][current[i].x - dx]) {
       wall = true;
     }
   }
   if (!wall) {
-    // console.log('moving')
     for (let i in current) {
       let x = current[i].x + dx
       let y = current[i].y + dy
@@ -103,7 +109,6 @@ function move(dx, dy) {
 
 
 function rotate() {
-  // console.log('rotate')
   if(current[0].style === 'ㅁ') return;
 
   function changeLoc(current, i) {
@@ -113,13 +118,13 @@ function rotate() {
     let temp = x;
     x = y + center.x;
     y = temp + center.y;
-    return [x,y]
+    return [x, y]
   }
 
   let wall = false;
   for(let i in current) {
     const [x, y] = changeLoc(current, i);
-    if (y + 1 < 0 || y > row - 1) {
+    if (y < 0 || y > row - 1) {
       wall = true;
       return;
     } else if(x < 0 || x > coloum - 1) {
@@ -131,7 +136,6 @@ function rotate() {
     } 
   }
   if (!wall) {
-    console.log('moving')
     for (let i in current) {
       const [x, y] = changeLoc(current, i);
       current[i].moveTo(x, y);
@@ -140,11 +144,10 @@ function rotate() {
 }
 
 function goDown(block) {
-  // console.log('goDown')
   let blocked = false;
   for(let i in current) {
     let x = current[i].x;
-    let y = Math.floor(current[i].y + speed);
+    let y = current[i].y + speed;
     if(x < 0 || x > coloum - 1) {
       blocked = true;
       return;
@@ -160,7 +163,7 @@ function goDown(block) {
   if(!blocked) {
     for(let i = 0; i < block.length; i ++) {
       let temp = block[i]
-      let y = Math.floor(current[i].y + speed)
+      let y = current[i].y + speed
       let x = temp.x
       temp.element.style['visibility'] = y < 0 ?  'hidden' : 'visible'
       temp.moveTo(x, y)
@@ -169,45 +172,48 @@ function goDown(block) {
 }
 
 function place(current) {
-  // console.log('plcae')
   let place = false;
   for(let i = 0; i < current.length; i ++) {
-    if(current[i].y >= row - 1 || checkBoard[current[i].y + 2] && checkBoard[current[i].y + 2][current[i].x]) {
+    if(current[i].y > row - 2 || checkBoard[current[i].y + 2] && checkBoard[current[i].y + 2][current[i].x]) {
       place = true;
       break;
     }
   }
-
   if(place) {
     for(let j = 0; j < current.length; j ++) {
       let block = current[j]
-      if(checkBoard[block.y + 1]) checkBoard[block.y + 1][block.x] = block
+      if(checkBoard[block.y + 1]) {
+        console.log('asign')
+        checkBoard[block.y + 1][block.x] = block
+      }  
     }
-    removeBlock(current);
+    removeBlock();
     regenerateBlock();
     pause = false;
-    console.log(checkBoard)
   }
 }
 
-function removeBlock(current) {
-  console.log('removeBlock=====')
+function removeBlock() {
   let row = [];
   for(let i in checkBoard) {
     let exist = true;
     for(let j in checkBoard[i]) {
       if(!checkBoard[i][j]) {
         exist = false
-        break;
       }
     }
     if(exist) {
       row.push(i)
     }
   }
+
   if(row.length) {
-    console.log('rowrow', row)
-    console.log('exist rows')
+    row.forEach(r => {
+      for(let col in checkBoard[r]) {
+        checkBoard[r][col].element.remove();
+      }
+    })
+
     row.forEach(r => {
       for(let i = 0; i < r; i ++) {
         for(let j = 0; j < coloum; j ++) {
@@ -219,17 +225,6 @@ function removeBlock(current) {
         }
       }
     })
-
-    row.forEach(r => {
-      for(let col in checkBoard[r]) {
-        checkBoard[r][col].element.remove();
-      }
-    })
-
-    let oneRow = []
-    for(let j = 0; j < coloum; j ++) {
-      oneRow.push(false);
-    }
   
     row.forEach(r => {
       checkBoard.splice(r,1)
@@ -239,13 +234,14 @@ function removeBlock(current) {
 }
 
 function regenerateBlock() {
-  console.log('regeneration')
+  console.log('regen')
   let blocks = [createBar, createL, createS, createZ, createㄱ, createㅁ, createㅗ]
   let random = Math.floor(Math.random() * Math.floor(7))
 
   for(let i = 0; i < coloum; i ++) {
     if(checkBoard[0][i]) {
       clearInterval(interval)
+      console.log('over')
       return;
     }
   }
@@ -316,20 +312,24 @@ function createㅗ(x, area) {
     new makeBlock(x + 1, -3, 'ㅗ', area),
   ]
 }
+
+
 regenerateBlock()
-// removeBlock()
 function operate() {
-  count++
-  // if(count === 3) {
-  //   clearInterval(interval)
-  // }
-  if(count % 10 === 0) {
-    // console.log('before')
-    !onMove && goDown(current)
-    !onMove && place(current)
-    onMove = false  
-    // console.log('after')
+  if(!nothing) {
+    count++
+    if(count % 10 === 0) {
+      !onMove && goDown(current)
+      !onMove && place(current)
+      onMove = false  
+    }  
   }
 }
 
 let interval = setInterval(operate, 10)
+
+function start() {
+  nothing = !nothing
+  console.log(current)
+  console.log(checkBoard)
+}
