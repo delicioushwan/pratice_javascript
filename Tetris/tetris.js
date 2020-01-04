@@ -10,7 +10,6 @@ let count = 0;
 let center = Math.floor((coloum - 1) / 2)
 let onMove = false;
 let checkBoard = [];
-let oneRow = []
 let nothing = false;
 
 for(let i = 0; i <= row; i ++) {
@@ -28,10 +27,6 @@ for(let i = 0; i < row; i ++) {
     span.style['top'] = (size * i) + 'px'
     gameWindow.appendChild(span)
   }
-}
-
-for(let j = 0; j < coloum; j ++) {
-  oneRow.push(false);
 }
 
 document.addEventListener('keydown',toMoveBlock)
@@ -227,6 +222,11 @@ function removeBlock() {
     })
   
     row.forEach(r => {
+      let oneRow = []
+
+      for(let i = 0; i < coloum; i ++) {
+        oneRow.push(false)
+      }
       checkBoard.splice(r,1)
       checkBoard.splice(0,0,oneRow)
     })
