@@ -46,11 +46,14 @@ function toMoveBlock(e) {
       e.preventDefault();
       rotate()
       break;
+    case 'ArrowDown':
+      e.preventDefault();
+      goToBottom();
+      break;
     default:
       console.log('nothing')
       break;
   }
-
 }
 
 function makeBlock(x, y, style, gameWindow) {
@@ -63,12 +66,10 @@ function makeBlock(x, y, style, gameWindow) {
 
 makeBlock.prototype.moveTo = function(x, y) {
   // console.log('moveTo')
-  let x1 = +x.toFixed(12);
-  let y1 = +y.toFixed(12);
-  this.x = x1;
-  this.y = y1;
-  this.element.style['left'] = (x1 * size) + 'px';
-  this.element.style['top'] = (y1 * size) + 'px';
+  this.x = x;
+  this.y = y;
+  this.element.style['left'] = (x * size) + 'px';
+  this.element.style['top'] = (y * size) + 'px';
 }
 
 function makeSpan(x, y, style) {
@@ -135,6 +136,31 @@ function rotate() {
       const [x, y] = changeLoc(current, i);
       current[i].moveTo(x, y);
     }
+  }
+}
+
+function goToBottom() {
+  let check = false;
+  let dy = 0;
+
+  while(!check) {
+    dy ++
+    for(let i in current) {
+      let x = current[i].x;
+      let y = current[i].y + dy;
+    
+      if(x < 0 || x > coloum - 1) {
+        check = true;
+      } else if(checkBoard[y + 1] && checkBoard[y + 1][x]) {
+        check = true;
+      } else if(y > row - 1) {
+        check = true;
+      }
+    }
+  }
+  if(check) {
+    move(0, dy - 1)
+    return;
   }
 }
 
@@ -333,3 +359,13 @@ function start() {
   console.log(current)
   console.log(checkBoard)
 }
+
+//사라질때 애니메이션
+//4개한번에 사라지면 효과 넣기
+//스페이스 또는 아래 버튼 누르면 뚝떨어지기
+//보이기전에 움직이기
+//스코어 및 설명 등 꾸미기
+
+
+//버그 이유 array의 특성 떄문 블록을 없애고 새로 추가된 ROW array들이 같은 지점을 바라보고 있었고 그로인해 그중하나에 블록이 지정되면 모두가 값을 가지게
+//되는현상.
