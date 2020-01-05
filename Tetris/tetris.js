@@ -6,18 +6,14 @@ const size = 30;
 let speed = Number(1);
 let pause = false;
 let current = null;
+let next = null;
+let keep;
 let count = 0;
 let center = Math.floor((coloum - 1) / 2)
 let onMove = false;
 let checkBoard = [];
 let nothing = false;
-
-for(let i = 0; i <= row; i ++) {
-  checkBoard.push([])
-  for(let j = 0; j < coloum; j ++) {
-    checkBoard[i][j] = false;
-  }
-}
+let interval;
 
 for(let i = 0; i < row; i ++) {
   for(let j = 0; j < coloum; j ++) {
@@ -35,20 +31,16 @@ function toMoveBlock(e) {
   onMove = true;
   switch (e.code) {
     case 'ArrowLeft':
-      e.preventDefault();
-      move(-1, 0)
+      goLeft(e)
       break;
     case 'ArrowRight':
-      e.preventDefault();
-      move(1, 0)
+      goRight(e)
       break;
     case 'ArrowUp':
-      e.preventDefault();
-      rotate()
+      rotate(e)
       break;
-    case 'ArrowDown':
-      e.preventDefault();
-      goToBottom();
+    case 'ArrowDown' || 'Space':
+      goToBottom(e);
       break;
     default:
       console.log('nothing')
@@ -103,8 +95,20 @@ function move(dx, dy) {
   }
 }
 
+function goLeft(e) {
+  e.preventDefault();
+  move(-1, 0)
+}
 
-function rotate() {
+function goRight(e) {
+  e.preventDefault();
+  move(1, 0)
+}
+
+
+function rotate(e) {
+  e.preventDefault();
+
   if(current[0].style === 'ㅁ') return;
 
   function changeLoc(current, i) {
@@ -139,7 +143,9 @@ function rotate() {
   }
 }
 
-function goToBottom() {
+function goToBottom(e) {
+  e.preventDefault();
+
   let check = false;
   let dy = 0;
 
@@ -260,10 +266,8 @@ function removeBlock() {
 }
 
 function regenerateBlock() {
-  console.log('regen')
   let blocks = [createBar, createL, createS, createZ, createㄱ, createㅁ, createㅗ]
   let random = Math.floor(Math.random() * Math.floor(7))
-
   for(let i = 0; i < coloum; i ++) {
     if(checkBoard[0][i]) {
       clearInterval(interval)
@@ -271,76 +275,97 @@ function regenerateBlock() {
       return;
     }
   }
-  current = blocks[random](center,gameWindow)
+  if(next === null) {
+    let random1 = Math.floor(Math.random() * Math.floor(7))
+    let random2 = Math.floor(Math.random() * Math.floor(7))
+
+    next = blocks[random1](2,nextArea, 7);
+
+    keep = blocks[random1]
+    current = blocks[random2](center,gameWindow);
+  } else {
+    console.log('runc')
+    current = keep(center, gameWindow)
+    console.log('current', current)
+
+    for(let i = 3 ; i >= 0; i --) {
+      next[i].element.remove();
+    }
+    next = blocks[random](2,nextArea, 7);  
+    keep = blocks[random] 
+  }
+  for(let i = 3 ; i >= 0; i --) {
+    next[i].element.style['visibility'] = 'visible';
+  }
+
   return current
 }
 
 // define blocks
-function createBar(x, area) {
+function createBar(x, area, y = 0) {
   return [
-    new makeBlock(x, -6, 'bar', area),
-    new makeBlock(x, -5, 'bar', area),
-    new makeBlock(x, -4, 'bar', area),
-    new makeBlock(x, -3, 'bar', area),   
+    new makeBlock(x, y -6, 'bar', area),
+    new makeBlock(x, y -5, 'bar', area),
+    new makeBlock(x, y -4, 'bar', area),
+    new makeBlock(x, y -3, 'bar', area),   
   ]
 }
 
-function createㄱ(x, area) {
+function createㄱ(x, area, y = 0) {
   return [
-    new makeBlock(x - 1, -5, 'ㄱ', area),
-    new makeBlock(x, -5, 'ㄱ', area),
-    new makeBlock(x, -4, 'ㄱ', area),
-    new makeBlock(x, -3, 'ㄱ', area),   
+    new makeBlock(x - 1, y -5, 'ㄱ', area),
+    new makeBlock(x, y -5, 'ㄱ', area),
+    new makeBlock(x, y -4, 'ㄱ', area),
+    new makeBlock(x, y -3, 'ㄱ', area),   
   ]
 }
 
-function createL(x, area) {
+function createL(x, area, y = 0) {
   return [
-    new makeBlock(x - 1, -3, 'L', area),   
-    new makeBlock(x, -3, 'L', area),
-    new makeBlock(x, -4, 'L', area),
-    new makeBlock(x, -5, 'L', area),
+    new makeBlock(x - 1, y -3, 'L', area),   
+    new makeBlock(x, y -3, 'L', area),
+    new makeBlock(x, y-4, 'L', area),
+    new makeBlock(x, y -5, 'L', area),
   ]
 }
 
-function createZ(x, area) {
+function createZ(x, area, y = 0) {
   return [
-    new makeBlock(x - 1, -4, 'z', area),
-    new makeBlock(x, -4, 'z', area),
-    new makeBlock(x, -3, 'z', area),
-    new makeBlock(x + 1, -3, 'z', area),   
+    new makeBlock(x - 1, y -4, 'z', area),
+    new makeBlock(x, y -4, 'z', area),
+    new makeBlock(x, y -3, 'z', area),
+    new makeBlock(x + 1, y -3, 'z', area),   
   ]
 }
 
-function createS(x, area) {
+function createS(x, area, y = 0) {
   return [
-    new makeBlock(x + 1, -4, 's', area),
-    new makeBlock(x, -4, 's', area),
-    new makeBlock(x, -3, 's', area),
-    new makeBlock(x - 1, -3, 's', area),   
+    new makeBlock(x + 1, y -4, 's', area),
+    new makeBlock(x, y -4, 's', area),
+    new makeBlock(x, y -3, 's', area),
+    new makeBlock(x - 1, y -3, 's', area),   
   ]
 }
 
-function createㅁ(x, area) {
+function createㅁ(x, area, y = 0) {
   return [
-    new makeBlock(x, -4, 'ㅁ', area),
-    new makeBlock(x + 1, -4, 'ㅁ', area),
-    new makeBlock(x + 1, -3, 'ㅁ', area),
-    new makeBlock(x, -3, 'ㅁ', area),   
+    new makeBlock(x, y -4, 'ㅁ', area),
+    new makeBlock(x + 1, y -4, 'ㅁ', area),
+    new makeBlock(x + 1, y -3, 'ㅁ', area),
+    new makeBlock(x, y -3, 'ㅁ', area),   
   ]
 }
 
-function createㅗ(x, area) {
+function createㅗ(x, area, y = 0) {
   return [
-    new makeBlock(x, -4, 'ㅗ', area),
-    new makeBlock(x, -3, 'ㅗ', area),
-    new makeBlock(x - 1, -3, 'ㅗ', area),
-    new makeBlock(x + 1, -3, 'ㅗ', area),
+    new makeBlock(x, y -4, 'ㅗ', area),
+    new makeBlock(x, y -3, 'ㅗ', area),
+    new makeBlock(x - 1, y -3, 'ㅗ', area),
+    new makeBlock(x + 1, y -3, 'ㅗ', area),
   ]
 }
 
 
-regenerateBlock()
 function operate() {
   if(!nothing) {
     count++
@@ -352,12 +377,30 @@ function operate() {
   }
 }
 
-let interval = setInterval(operate, 10)
+
+function stop() {
+  let stopButton = document.getElementById('stop');
+  nothing = !nothing
+  stopButton.innerText = !nothing ? 'stop' : 'resume'
+  if(nothing) {
+    clearInterval(interval)
+  } else {
+    interval = setInterval(operate, 10)
+  }
+}
 
 function start() {
-  nothing = !nothing
-  console.log(current)
-  console.log(checkBoard)
+  checkBoard = [];
+  for(let i = 0; i <= row; i ++) {
+    checkBoard.push([])
+    for(let j = 0; j < coloum; j ++) {
+      checkBoard[i][j] = false;
+    }
+  }
+  regenerateBlock()
+  interval = setInterval(operate, 10)
+
+
 }
 
 //사라질때 애니메이션
