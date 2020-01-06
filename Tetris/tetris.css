@@ -42,12 +42,19 @@ span {
 
 #description_container{
   min-width: 400px;
+  overflow: hidden;
 }
 
 #next_block {
   position: relative;
-  width: 50px;
-  height: 50px;
+  width: 200px;
+  height: 200px;
+}
+
+#next_block > div {
+  font-family: sans-serif;
+  font-weight: 700;
+  margin: 10px;
 }
 
 button:hover {

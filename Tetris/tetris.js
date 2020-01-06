@@ -80,9 +80,6 @@ function makeSpan(x, y, style) {
 function move(dx, dy) {
   let wall = false;
   for (let i in current) {
-    // if (current[i].y < 0) {
-    //   wall = true;
-    // } else 
     if(current[i].x + dx < 0 || current[i].x + dx > coloum - 1) {
       wall = true;
     } else if(current[i].y >= 0 && (checkBoard[current[i].y + 1 + dy][current[i].x + dx] || checkBoard[current[i].y + 1 + dy][current[i].x - dx])) {
@@ -176,8 +173,11 @@ function goToBottom(e) {
 function goDown(block) {
   let blocked = false;
   for(let i in current) {
+
     let x = current[i].x;
     let y = current[i].y + speed;
+    current[i].element.style['visibility'] = y < 0 ?  'hidden' : 'visible'
+
     if(x < 0 || x > coloum - 1) {
       blocked = true;
       return;
@@ -195,7 +195,6 @@ function goDown(block) {
       let temp = block[i]
       let y = current[i].y + speed
       let x = temp.x
-      temp.element.style['visibility'] = y < 0 ?  'hidden' : 'visible'
       temp.moveTo(x, y)
     }
   }
@@ -213,7 +212,6 @@ function place(current) {
     for(let j = 0; j < current.length; j ++) {
       let block = current[j]
       if(checkBoard[block.y + 1]) {
-        console.log('asign')
         checkBoard[block.y + 1][block.x] = block
       }  
     }
@@ -401,6 +399,11 @@ function stop() {
 
 function start() {
   checkBoard = [];
+  const block = document.getElementsByClassName('block_span')
+  for(let i = block.length - 1; i >= 0; i --) {
+    block.remove();
+  }
+
   for(let i = 0; i <= row; i ++) {
     checkBoard.push([])
     for(let j = 0; j < coloum; j ++) {
