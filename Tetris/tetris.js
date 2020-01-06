@@ -393,6 +393,7 @@ function stop() {
   if(nothing) {
     clearInterval(interval)
   } else {
+    clearInterval(interval)
     interval = setInterval(operate, 10)
   }
 }
@@ -401,7 +402,7 @@ function start() {
   checkBoard = [];
   const block = document.getElementsByClassName('block_span')
   for(let i = block.length - 1; i >= 0; i --) {
-    block.remove();
+    block[i].remove();
   }
 
   for(let i = 0; i <= row; i ++) {
@@ -411,6 +412,7 @@ function start() {
     }
   }
   regenerateBlock()
+  clearInterval(interval)
   interval = setInterval(operate, 10)
 
 
