@@ -80,11 +80,12 @@ function makeSpan(x, y, style) {
 function move(dx, dy) {
   let wall = false;
   for (let i in current) {
-    if (current[i].y < 0) {
+    // if (current[i].y < 0) {
+    //   wall = true;
+    // } else 
+    if(current[i].x + dx < 0 || current[i].x + dx > coloum - 1) {
       wall = true;
-    } else if(current[i].x + dx < 0 || current[i].x + dx > coloum - 1) {
-      wall = true;
-    } else if(checkBoard[current[i].y + 1 + dy][current[i].x + dx] || checkBoard[current[i].y + 1 + dy][current[i].x - dx]) {
+    } else if(current[i].y >= 0 && (checkBoard[current[i].y + 1 + dy][current[i].x + dx] || checkBoard[current[i].y + 1 + dy][current[i].x - dx])) {
       wall = true;
     }
   }
@@ -413,11 +414,10 @@ function start() {
 }
 
 //사라질때 애니메이션
-//4개한번에 사라지면 효과 넣기
 //스페이스 또는 아래 버튼 누르면 뚝떨어지기
 //보이기전에 움직이기
 //스코어 및 설명 등 꾸미기
-
+//코드 정리!
 
 //버그 이유 array의 특성 떄문 블록을 없애고 새로 추가된 ROW array들이 같은 지점을 바라보고 있었고 그로인해 그중하나에 블록이 지정되면 모두가 값을 가지게
 //되는현상.
