@@ -14,6 +14,7 @@ let onMove = false;
 let checkBoard = [];
 let nothing = false;
 let interval;
+let breakBlocks = false;
 
 for(let i = 0; i < row; i ++) {
   for(let j = 0; j < coloum; j ++) {
@@ -39,11 +40,12 @@ function toMoveBlock(e) {
     case 'ArrowUp':
       rotate(e)
       break;
-    case 'ArrowDown' || 'Space':
+    case 'ArrowDown':
+    case 'Space':
       goToBottom(e);
       break;
     default:
-      console.log('nothing')
+      console.log('nothing', e.code)
       break;
   }
 }
@@ -235,33 +237,43 @@ function removeBlock() {
   }
 
   if(row.length) {
+    breakBlocks = true;
     row.forEach(r => {
       for(let col in checkBoard[r]) {
-        checkBoard[r][col].element.remove();
+        checkBoard[r][col].element.classList.add('break');
       }
     })
 
-    row.forEach(r => {
-      for(let i = 0; i < r; i ++) {
-        for(let j = 0; j < coloum; j ++) {
-          if(checkBoard[i][j]) {
-            let y = checkBoard[i][j].y + 1
-            let x = checkBoard[i][j].x
-            checkBoard[i][j].moveTo(x,y)
+    setTimeout(() => {
+      row.forEach(r => {
+        for(let col in checkBoard[r]) {
+          checkBoard[r][col].element.remove();
+        }
+      })
+  
+      row.forEach(r => {
+        for(let i = 0; i < r; i ++) {
+          for(let j = 0; j < coloum; j ++) {
+            if(checkBoard[i][j]) {
+              let y = checkBoard[i][j].y + 1
+              let x = checkBoard[i][j].x
+              checkBoard[i][j].moveTo(x,y)
+            }
           }
         }
-      }
-    })
+      })
+    
+      row.forEach(r => {
+        let oneRow = []
   
-    row.forEach(r => {
-      let oneRow = []
-
-      for(let i = 0; i < coloum; i ++) {
-        oneRow.push(false)
-      }
-      checkBoard.splice(r,1)
-      checkBoard.splice(0,0,oneRow)
-    })
+        for(let i = 0; i < coloum; i ++) {
+          oneRow.push(false)
+        }
+        checkBoard.splice(r,1)
+        checkBoard.splice(0,0,oneRow)
+      })
+      setTimeout(() => breakBlocks = false, 500)
+    }, 400)
   }
 }
 
@@ -284,10 +296,7 @@ function regenerateBlock() {
     keep = blocks[random1]
     current = blocks[random2](center,gameWindow);
   } else {
-    console.log('runc')
     current = keep(center, gameWindow)
-    console.log('current', current)
-
     for(let i = 3 ; i >= 0; i --) {
       next[i].element.remove();
     }
@@ -370,8 +379,8 @@ function operate() {
   if(!nothing) {
     count++
     if(count % 10 === 0) {
-      !onMove && goDown(current)
-      !onMove && place(current)
+      !breakBlocks && !onMove && goDown(current)
+      !breakBlocks && !onMove && place(current)
       onMove = false  
     }  
   }

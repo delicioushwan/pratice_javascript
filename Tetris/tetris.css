@@ -98,3 +98,12 @@ span {
 .ㅗ {
   background: orange;
 }
+
+.break {
+  animation: blink 0.2s linear infinite;
+}
+
+@keyframes blink{
+  0%{opacity: 0;}
+  100%{opacity: 1;}
+}
