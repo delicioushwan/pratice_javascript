@@ -1,5 +1,6 @@
-const gameWindow = document.getElementById('game_window')
-const nextArea = document.getElementById('next_block')
+const gameWindow = document.getElementById('game_window');
+const nextArea = document.getElementById('next_block');
+const score = document.getElementById('score_num');
 const coloum = 12;
 const row = 25;
 const size = 30;
@@ -254,25 +255,29 @@ function removeBlock() {
         for(let i = 0; i < r; i ++) {
           for(let j = 0; j < coloum; j ++) {
             if(checkBoard[i][j]) {
-              let y = checkBoard[i][j].y + 1
-              let x = checkBoard[i][j].x
-              checkBoard[i][j].moveTo(x,y)
+              let y = checkBoard[i][j].y + 1;
+              let x = checkBoard[i][j].x;
+              checkBoard[i][j].moveTo(x,y);
             }
           }
         }
       })
     
       row.forEach(r => {
-        let oneRow = []
-  
+        let oneRow = [];
         for(let i = 0; i < coloum; i ++) {
-          oneRow.push(false)
+          oneRow.push(false);
         }
-        checkBoard.splice(r,1)
-        checkBoard.splice(0,0,oneRow)
+        checkBoard.splice(r,1);
+        checkBoard.splice(0,0,oneRow);
       })
-      setTimeout(() => breakBlocks = false, 500)
-    }, 400)
+      let oldScore = score.innerText;
+      let num = 100 * row.length * row.length
+      console.log(oldScore + num)
+      score.innerText = (+oldScore) + num;
+      console.log(score.innerText)
+      setTimeout(() => breakBlocks = false, 500);
+    }, 400);
   }
 }
 
@@ -418,10 +423,7 @@ function start() {
 
 }
 
-//사라질때 애니메이션
-//스페이스 또는 아래 버튼 누르면 뚝떨어지기
-//보이기전에 움직이기
-//스코어 및 설명 등 꾸미기
+
 //코드 정리!
 
 //버그 이유 array의 특성 떄문 블록을 없애고 새로 추가된 ROW array들이 같은 지점을 바라보고 있었고 그로인해 그중하나에 블록이 지정되면 모두가 값을 가지게

@@ -13,7 +13,7 @@ span {
   box-sizing: border-box;
 }
 
-#score {
+#top {
   height: 200px;
   width: 100%;
 }
@@ -45,16 +45,28 @@ span {
   overflow: hidden;
 }
 
+#description_container::after{
+  content: '';
+  display: table;
+  clear: both
+}
+
 #next_block {
   position: relative;
   width: 200px;
   height: 200px;
+  float:left;
 }
 
 #next_block > div {
   font-family: sans-serif;
   font-weight: 700;
   margin: 10px;
+}
+
+#score {
+  padding: 20px;
+  height: 200px;
 }
 
 button:hover {
