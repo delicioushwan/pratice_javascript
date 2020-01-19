@@ -60,7 +60,6 @@ function makeBlock(x, y, style, gameWindow) {
 }
 
 makeBlock.prototype.moveTo = function(x, y) {
-  // console.log('moveTo')
   this.x = x;
   this.y = y;
   this.element.style['left'] = (x * size) + 'px';
@@ -79,15 +78,7 @@ function makeSpan(x, y, style) {
 }
 
 function move(dx, dy) {
-  let wall = false;
-  for (let i in current) {
-    if(current[i].x + dx < 0 || current[i].x + dx > coloum - 1) {
-      wall = true;
-    } else if(current[i].y >= 0 && (checkBoard[current[i].y + 1 + dy][current[i].x + dx] || checkBoard[current[i].y + 1 + dy][current[i].x - dx])) {
-      wall = true;
-    }
-  }
-  if (!wall) {
+  if (!blocked(dx, dy)) {
     for (let i in current) {
       let x = current[i].x + dx
       let y = current[i].y + dy
@@ -172,54 +163,30 @@ function goToBottom(e) {
 }
 
 function goDown(block) {
-  let blocked = false;
   for(let i in current) {
-
-    let x = current[i].x;
     let y = current[i].y + speed;
     current[i].element.style['visibility'] = y < 0 ?  'hidden' : 'visible'
-
-    if(x < 0 || x > coloum - 1) {
-      blocked = true;
-      return;
-    } else if(checkBoard[y + 1] && checkBoard[y + 1][x]) {
-      blocked = true;
-      return;
-    } else if(y > row - 1) {
-      blocked = true;
-      return;
-    }
   }
 
-  if(!blocked) {
+  if(!blocked(0, speed)) {
     for(let i = 0; i < block.length; i ++) {
       let temp = block[i]
       let y = current[i].y + speed
       let x = temp.x
       temp.moveTo(x, y)
     }
+  } else {
+    place(current)
   }
 }
 
-function place(current) {
-  let place = false;
-  for(let i = 0; i < current.length; i ++) {
-    if(current[i].y > row - 2 || checkBoard[current[i].y + 2] && checkBoard[current[i].y + 2][current[i].x]) {
-      place = true;
-      break;
-    }
+function place(current) {  
+  for(let j = 0; j < current.length; j ++) {
+    let block = current[j]
+    checkBoard[block.y + 1][block.x] = block
   }
-  if(place) {
-    for(let j = 0; j < current.length; j ++) {
-      let block = current[j]
-      if(checkBoard[block.y + 1]) {
-        checkBoard[block.y + 1][block.x] = block
-      }  
-    }
-    removeBlock();
-    regenerateBlock();
-    pause = false;
-  }
+  removeBlock();
+  regenerateBlock();
 }
 
 function removeBlock() {
@@ -273,9 +240,7 @@ function removeBlock() {
       })
       let oldScore = score.innerText;
       let num = 100 * row.length * row.length
-      console.log(oldScore + num)
       score.innerText = (+oldScore) + num;
-      console.log(score.innerText)
       setTimeout(() => breakBlocks = false, 500);
     }, 400);
   }
@@ -314,7 +279,23 @@ function regenerateBlock() {
   return current
 }
 
-// define blocks
+function blocked (dx, dy) {
+  for(let i in current) {
+
+    let x = current[i].x + dx;
+    let y = current[i].y + dy;
+
+    if(x < 0 || x > coloum - 1) {
+      return true;
+    } else if(checkBoard[y + 1] && checkBoard[y + 1][x]) {
+      return true;
+    } else if(y > row - 1) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function createBar(x, area, y = 0) {
   return [
     new makeBlock(x, y -6, 'bar', area),
@@ -384,7 +365,6 @@ function operate() {
     count++
     if(count % 10 === 0) {
       !breakBlocks && !onMove && goDown(current)
-      !breakBlocks && !onMove && place(current)
       onMove = false  
     }  
   }
